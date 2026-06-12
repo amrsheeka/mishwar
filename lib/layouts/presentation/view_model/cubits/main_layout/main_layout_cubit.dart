@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mishwar/features/appointments/views/appointments_view.dart';
+
 import 'package:mishwar/features/home/views/home_view.dart';
 import 'package:mishwar/features/profile/views/profile_view.dart';
 import 'package:mishwar/features/search/views/search_view.dart';

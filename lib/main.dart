@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
-import 'package:mishwar/features/auth/presentation/views/login_view.dart';
+import 'package:mishwar/core/utils/dio_helper.dart';
+// import 'package:mishwar/core/utils/services.dart';
+
 import 'package:mishwar/layouts/presentation/views/main_layout.dart';
 
 void main() {
+  DioHelper.init();
   runApp(const MyApp());
 }
 

@@ -11,6 +11,7 @@ class AppColors {
 
   static const surface = Color(0xFFE9E2E9);
   static const surfaceDark = Color(0xFF1E1E1E);
+  static const rating = Colors.yellow;
 
   static const error = Color(0xFFB00020);
 }

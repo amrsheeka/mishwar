@@ -16,6 +16,29 @@ class MainLayout extends StatelessWidget {
         builder: (context, state) {
           MainLayoutCubit cubit = context.read<MainLayoutCubit>();
           return Scaffold(
+            appBar: AppBar(
+              actions: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(IconBroken.Search),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(IconBroken.Notification),
+                ),
+                
+              ],
+              title: Container(
+                height: 120,
+                width: 120,
+                decoration: BoxDecoration(
+                  image: const DecorationImage(
+                    image: AssetImage('images/logo_name.png'),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
             bottomNavigationBar: ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(25),
