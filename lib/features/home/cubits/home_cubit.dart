@@ -23,6 +23,7 @@ class HomeCubit extends Cubit<HomeState> {
     emit(GetFeaturedCarsLoadingState());
     try {
       featuredCarsModel = await HomeServices.getFeaturedCars();
+
       if (featuredCarsModel != null) {
         emit(GetFeaturedCarsSuccessState());
       } else {
@@ -32,6 +33,40 @@ class HomeCubit extends Cubit<HomeState> {
       emit(GetFeaturedCarsErrorState('Failed to load featured cars'));
     }
   }
+
+  bool isLoadingMore = false;
+
+  Future<void> loadMoreFeaturedCars() async {
+    
+  if (isLoadingMore) return;
+
+  final nextPageUrl = featuredCarsModel?.cars.nextPageUrl;
+
+  if (nextPageUrl == null) return;
+
+  isLoadingMore = true;
+
+  emit(GetMoreFeaturedCarsLoadingState());
+  try {
+    final more = await HomeServices.getMoreFeaturedCars(nextPageUrl);
+    
+    if (featuredCarsModel==null || more==null) {
+      return;
+    }
+    
+    featuredCarsModel!.cars.data.addAll(more.cars.data);
+    featuredCarsModel!.cars.nextPageUrl =
+        more.cars.nextPageUrl;
+
+    emit(GetMoreFeaturedCarsSuccessState());
+  } catch (e) {
+    emit(GetMoreFeaturedCarsErrorState(
+      'Failed to load more featured cars',
+    ));
+  } finally {
+    isLoadingMore = false;
+  }
+}
 
   BrandsModel? brandsModel;
   void getBrands() async {

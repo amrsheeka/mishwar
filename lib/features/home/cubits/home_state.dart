@@ -13,3 +13,12 @@ class GetBrandsErrorState extends HomeState {
   String message;
   GetBrandsErrorState(this.message);
 }
+class GetMoreFeaturedCarsLoadingState extends HomeState {}
+
+class GetMoreFeaturedCarsSuccessState extends HomeState {}
+
+class GetMoreFeaturedCarsErrorState extends HomeState {
+  final String error;
+
+  GetMoreFeaturedCarsErrorState(this.error);
+}

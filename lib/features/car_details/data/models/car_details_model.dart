@@ -1,71 +1,30 @@
-class FeaturedCarsModel {
-  FeaturedCarsModel({
+class CarDetailsModel {
+  CarDetailsModel({
     required this.success,
     required this.message,
-    required this.cars,
+    required this.car,
   });
-  late bool success;
-  late String message;
-  late Cars cars;
+  late final bool success;
+  late final String message;
+  late final Car car;
   
-  FeaturedCarsModel.fromJson(Map<String, dynamic> json){
+  CarDetailsModel.fromJson(Map<String, dynamic> json){
     success = json['success'];
     message = json['message'];
-    cars = Cars.fromJson(json['cars']);
+    car = Car.fromJson(json['car']);
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['success'] = success;
     _data['message'] = message;
-    _data['cars'] = cars.toJson();
+    _data['car'] = car.toJson();
     return _data;
   }
 }
 
-class Cars {
-  Cars({
-    required this.data,
-    required this.path,
-    required this.perPage,
-    required this.nextCursor,
-    required this.nextPageUrl,
-     this.prevCursor,
-     this.prevPageUrl,
-  });
-  late List<Data> data;
-  late String? path;
-  late int? perPage;
-  late String? nextCursor;
-  late String? nextPageUrl;
-  late String? prevCursor;
-  late String? prevPageUrl;
-  
-  Cars.fromJson(Map<String, dynamic> json){
-    data = List.from(json['data']).map((e)=>Data.fromJson(e)).toList();
-    path = json['path'];
-    perPage = json['per_page'];
-    nextCursor = json['next_cursor'];
-    nextPageUrl = json['next_page_url'];
-    prevCursor = json['prev_cursor'];
-    prevPageUrl = json['prev_page_url'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['data'] = data.map((e)=>e.toJson()).toList();
-    _data['path'] = path;
-    _data['per_page'] = perPage;
-    _data['next_cursor'] = nextCursor;
-    _data['next_page_url'] = nextPageUrl;
-    _data['prev_cursor'] = prevCursor;
-    _data['prev_page_url'] = prevPageUrl;
-    return _data;
-  }
-}
-
-class Data {
-  Data({
+class Car {
+  Car({
     required this.id,
     required this.branchId,
     required this.brandId,
@@ -82,7 +41,7 @@ class Data {
     required this.createdAt,
     required this.updatedAt,
     required this.branch,
-    required this.primaryImage,
+    required this.images,
     required this.brand,
   });
   late final int id;
@@ -94,17 +53,17 @@ class Data {
   late final String transmission;
   late final String fuelType;
   late final int seats;
-  late final double pricePerDay;
+  late final String pricePerDay;
   late final String description;
   late final String status;
   late final int featured;
   late final String createdAt;
   late final String updatedAt;
   late final Branch branch;
-  late final PrimaryImage primaryImage;
+  late final List<Images> images;
   late final Brand brand;
   
-  Data.fromJson(Map<String, dynamic> json){
+  Car.fromJson(Map<String, dynamic> json){
     id = json['id'];
     branchId = json['branch_id'];
     brandId = json['brand_id'];
@@ -114,14 +73,14 @@ class Data {
     transmission = json['transmission'];
     fuelType = json['fuel_type'];
     seats = json['seats'];
-    pricePerDay = double.parse(json['price_per_day']);
+    pricePerDay = json['price_per_day'];
     description = json['description'];
     status = json['status'];
     featured = json['featured'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     branch = Branch.fromJson(json['branch']);
-    primaryImage = PrimaryImage.fromJson(json['primary_image']);
+    images = List.from(json['images']).map((e)=>Images.fromJson(e)).toList();
     brand = Brand.fromJson(json['brand']);
   }
 
@@ -143,7 +102,7 @@ class Data {
     _data['created_at'] = createdAt;
     _data['updated_at'] = updatedAt;
     _data['branch'] = branch.toJson();
-    _data['primary_image'] = primaryImage.toJson();
+    _data['images'] = images.map((e)=>e.toJson()).toList();
     _data['brand'] = brand.toJson();
     return _data;
   }
@@ -194,8 +153,8 @@ class Branch {
   }
 }
 
-class PrimaryImage {
-  PrimaryImage({
+class Images {
+  Images({
     required this.id,
     required this.carId,
     required this.isMain,
@@ -210,7 +169,7 @@ class PrimaryImage {
   late final String updatedAt;
   late final String imageUrl;
   
-  PrimaryImage.fromJson(Map<String, dynamic> json){
+  Images.fromJson(Map<String, dynamic> json){
     id = json['id'];
     carId = json['car_id'];
     isMain = json['is_main'];

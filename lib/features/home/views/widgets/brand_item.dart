@@ -8,15 +8,19 @@ class BrandItem extends StatelessWidget {
   const BrandItem({super.key, required this.imageUrl, required this.index});
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(5.0),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark?AppColors.surfaceDark : AppColors.surface,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Center(
         child: CachedNetworkImage(
           imageUrl: imageUrl,
+          placeholder: (context, url) =>
+                  Container(color: AppColors.grey.withValues(alpha: 0.3)),
+          errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
         ),
       ),
     );

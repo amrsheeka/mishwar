@@ -1,0 +1,1 @@
+const String defaultImage = 'images/default.png';
