@@ -1,14 +1,16 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mishwar/core/models/car.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
 import 'package:mishwar/core/styles/icon_broken.dart';
-import 'package:mishwar/core/utils/contants.dart';
 import 'package:mishwar/features/car_details/cubits/car_details/car_details_cubit.dart';
 import 'package:mishwar/features/car_details/cubits/car_details/car_details_state.dart';
 import 'package:mishwar/features/car_details/data/models/car_details_model.dart';
+import 'package:mishwar/features/car_details/views/widgets/car_preview.dart';
+import 'package:mishwar/features/car_details/views/widgets/description_card.dart';
+import 'package:mishwar/features/car_details/views/widgets/quick_info_card.dart';
+import 'package:mishwar/features/car_details/views/widgets/specification_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class CarDetailsView extends StatefulWidget {
   final int id;
@@ -19,14 +21,6 @@ class CarDetailsView extends StatefulWidget {
 }
 
 class _CarDetailsViewState extends State<CarDetailsView> {
-  late final PageController pageController;
-  int pageIndex = 0;
-  @override
-  void initState() {
-    super.initState();
-    pageController = PageController();
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -51,24 +45,25 @@ class _CarDetailsViewState extends State<CarDetailsView> {
                 ),
               ),
               actions: [
+                //todo
                 Skeletonizer(
                   enabled: isLoading,
                   child: IconButton(
                     onPressed: () {},
                     icon: Container(
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: true ? (AppColors.surface) : AppColors.secondary,
+                        shape: BoxShape.circle,
+                        color:isDark? AppColors.surfaceDark:AppColors.surface,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Center(
-                          child: Icon(
-                            IconBroken.Heart,
-                            color: isDark
-                                ? AppColors.background
-                                : AppColors.backgroundDark,
-                          ),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {},
+                        icon: Icon(
+                          IconBroken.Heart,
+                          size: 20,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -84,76 +79,65 @@ class _CarDetailsViewState extends State<CarDetailsView> {
               enabled: isLoading,
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Stack(
-                      children: [
-                        SizedBox(
-                          height: 300,
-                          child: PageView.builder(
-                            itemCount: car?.images.length ?? 1,
-                            controller: pageController,
-                            physics: BouncingScrollPhysics(),
-                            onPageChanged: (index) {
-                              setState(() {
-                                pageIndex = index;
-                              });
-                            },
-                            itemBuilder: (context, index) => SizedBox(
-                              height: 200,
-                              width: double.maxFinite,
-                              child: car == null
-                                  ? Image.asset(defaultImage)
-                                  : CachedNetworkImage(
-                                      imageUrl: car.images[index].imageUrl,
-                                    ),
+                    CarPreview(car: car),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          quickInfoCard(car:car),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: Text(
+                              'Specification',
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ),
-                        ),
-                        Positioned(
-                          bottom: 10,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: AnimatedSmoothIndicator(
-                              effect: ExpandingDotsEffect(
-                                activeDotColor: AppColors.primary,
-                              ),
-                              onDotClicked: (index) {
-                                pageController.jumpToPage(index);
-                              },
-                              activeIndex: pageIndex,
-                              count: car?.images.length ?? 1,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 0,
-                          bottom: 0,
-                          child: IconButton(
-                            onPressed: () {
-                              pageController.previousPage(
-                                duration: Duration(milliseconds: 200),
-                                curve: Curves.linear,
+
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              int crossAxisCount = constraints.maxWidth < 600
+                                  ? 2
+                                  : 4;
+
+                              return GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 2.3,
+                                children: [
+                                  SpecificationItem(
+                                    title: 'Number of seats',
+                                    icon: Icons.chair_sharp,
+                                    value: '${car?.seats}',
+                                  ),
+                                  SpecificationItem(
+                                    title: 'Common fuel inj.',
+                                    icon: Icons.propane_tank_sharp,
+                                    value: '${car?.fuelType}',
+                                  ),
+                                  SpecificationItem(
+                                    title: 'Skin color',
+                                    icon: Icons.color_lens_rounded,
+                                    value: '${car?.color}',
+                                  ),
+                                  SpecificationItem(
+                                    title: 'Drive transmission',
+                                    icon: Icons.drive_eta_sharp,
+                                    value: '${car?.transmission}',
+                                  ),
+                                ],
                               );
                             },
-                            icon: Icon(IconBroken.Arrow___Left_2),
                           ),
-                        ),
-                        Positioned(
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          child: IconButton(
-                            onPressed: () {
-                              pageController.nextPage(
-                                duration: Duration(milliseconds: 200),
-                                curve: Curves.linear,
-                              );
-                            },
-                            icon: Icon(IconBroken.Arrow___Right_2),
-                          ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                          descriptionCard(context,car?.description ?? ''),
+                        ],
+                      ),
                     ),
                   ],
                 ),

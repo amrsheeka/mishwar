@@ -11,7 +11,6 @@ class CarDetailsCubit extends Cubit<CarDetailsState> {
     emit(GetCarDetailsLoadingState());
     try {
       carDetailsModel = await CarDetailsService.getCarById(id);
-
       if (carDetailsModel != null) {
         emit(GetCarDetailsSuccessState());
       } else {
