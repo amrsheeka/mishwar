@@ -19,7 +19,9 @@ class MainLayout extends StatelessWidget {
             appBar: AppBar(
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    cubit.changeBottomNavBar(2);
+                  },
                   icon: const Icon(IconBroken.Search),
                 ),
                 IconButton(

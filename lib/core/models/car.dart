@@ -37,6 +37,8 @@ class Car {
   late final Branch branch;
   late final List<Images> images;
   late final Brand brand;
+  late final int reviewsCount;
+  late final double reviewsAvgRating;
   
   Car.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -57,6 +59,8 @@ class Car {
     branch = Branch.fromJson(json['branch']);
     images = List.from(json['images']).map((e)=>Images.fromJson(e)).toList();
     brand = Brand.fromJson(json['brand']);
+    reviewsCount = json['revewis_count'];
+    reviewsAvgRating = double.parse(json['reviews_avg_rating']);
   }
 
   Map<String, dynamic> toJson() {

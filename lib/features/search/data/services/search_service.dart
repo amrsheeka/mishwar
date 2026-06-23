@@ -28,7 +28,7 @@ class SearchService {
     try {
 
       if (nextPageUrl != null) {
-        final response = await DioHelper.getData(url: nextPageUrl);
+        final response = await DioHelper.postData(url: nextPageUrl);
 
         if (response.statusCode == 200) {
           return SearchResultsModel.fromJson(response.data);

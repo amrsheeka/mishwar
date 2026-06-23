@@ -47,45 +47,50 @@ class DefaultCarCard extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              CachedNetworkImage(
-                imageUrl: imageUrl,
-                width: double.maxFinite,
-                fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    Container(color: AppColors.grey.withValues(alpha: 0.3)),
-                errorWidget: (context, url, error) =>
-                    Image.asset(defaultImage),
+              ClipRRect(
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.circular(12),
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  height: 180,
+                  width: double.maxFinite,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      Container(color: AppColors.grey.withValues(alpha: 0.3)),
+                  errorWidget: (context, url, error) =>
+                      Image.asset(defaultImage),
+                ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(height: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        flex: 2,
                         child: Text(
                           '$brandName $model $year',
                           style: Theme.of(context).textTheme.titleLarge,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(IconBroken.Star, color: AppColors.rating),
-                            ),
-                            Text('0.0'),
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(IconBroken.Star, color: AppColors.rating),
+                          ),
+                          Text('0.0'),
+                        ],
                       ),
                     ],
                   ),
                   Row(
+                    
                     children: [
                       Icon(Icons.chair_sharp, color: AppColors.secondary),
       
@@ -93,16 +98,16 @@ class DefaultCarCard extends StatelessWidget {
                         '$seats',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      const Spacer(),
-                      Icon(Icons.propane_tank_sharp, color: AppColors.secondary),
+                      // const Spacer(),
+                      // Icon(Icons.propane_tank_sharp, color: AppColors.secondary),
       
-                      Text(
-                        fuelType,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const Spacer(),
+                      // Text(
+                      //   fuelType,
+                      //   style: Theme.of(context).textTheme.titleMedium,
+                      //   maxLines: 1,
+                      //   overflow: TextOverflow.ellipsis,
+                      // ),
+                      const SizedBox(width: 20,),
                       Icon(Icons.drive_eta_sharp, color: AppColors.secondary),
       
                       Text(
@@ -111,7 +116,7 @@ class DefaultCarCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        '\$',
+                        '\$ ',
                         style: Theme.of(
                           context,
                         ).textTheme.titleMedium?.copyWith(color: Colors.green),
@@ -122,7 +127,7 @@ class DefaultCarCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
-                        '/d',
+                        ' /d',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.grey),
                       ),
                     ],

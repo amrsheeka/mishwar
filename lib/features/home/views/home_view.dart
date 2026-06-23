@@ -176,6 +176,7 @@ class _HomeViewState extends State<HomeView> {
                             ? null
                             : cubit.brandsModel?.brands[index];
                         return BrandItem(
+                          id: cubit.brandsModel?.brands[index].id??1,
                           index: index,
                           imageUrl: brand?.logo ?? '',
                         );

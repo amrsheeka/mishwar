@@ -84,6 +84,8 @@ class Data {
     required this.branch,
     required this.primaryImage,
     required this.brand,
+    required this.reviewsAvgRating,
+    required this.reviewsCount
   });
   late final int id;
   late final int branchId;
@@ -103,6 +105,9 @@ class Data {
   late final Branch branch;
   late final PrimaryImage primaryImage;
   late final Brand brand;
+  late final int reviewsCount;
+  late final double reviewsAvgRating;
+
   
   Data.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -123,6 +128,8 @@ class Data {
     branch = Branch.fromJson(json['branch']);
     primaryImage = PrimaryImage.fromJson(json['primary_image']);
     brand = Brand.fromJson(json['brand']);
+    reviewsCount = json['revewis_count'];
+    reviewsAvgRating = double.parse(json['reviews_avg_rating']);
   }
 
   Map<String, dynamic> toJson() {

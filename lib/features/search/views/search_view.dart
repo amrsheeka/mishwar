@@ -194,6 +194,8 @@ class _SearchViewState extends State<SearchView> {
       minPrice: minPrice,
       maxPrice: maxPrice,
     );
-    navigateTo(context: context, page: SearchResultsView(params: params));
+    navigateTo(context: context, page: BlocProvider(
+      create: (context) => SearchCubit()..search(params),
+      child: SearchResultsView(params: params)));
   }
 }
