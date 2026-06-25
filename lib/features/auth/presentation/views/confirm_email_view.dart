@@ -5,7 +5,7 @@ import 'package:mishwar/core/utils/navigation.dart';
 import 'package:mishwar/core/utils/toast.dart';
 import 'package:mishwar/core/widgets/default_back_button.dart';
 import 'package:mishwar/core/widgets/default_button.dart';
-import 'package:mishwar/core/widgets/default_text_field.dart';
+import 'package:mishwar/core/widgets/responsive_content.dart';
 import 'package:mishwar/features/auth/presentation/view_model/cubit/auth_cubit.dart';
 import 'package:mishwar/features/auth/presentation/views/login_view.dart';
 import 'package:mishwar/layouts/presentation/views/main_layout.dart';
@@ -41,6 +41,25 @@ class _ConfirmEmailViewState extends State<ConfirmEmailView> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surface;
+    final PinTheme pinTheme = PinTheme(
+      width: 52,
+      height: 56,
+      textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w800,
+      ),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: isDark ? 0.20 : 0.12),
+        ),
+      ),
+    );
+
     return BlocProvider(
       create: (_) => AuthCubit(),
       child: BlocConsumer<AuthCubit, AuthState>(
@@ -63,8 +82,8 @@ class _ConfirmEmailViewState extends State<ConfirmEmailView> {
 
           return Scaffold(
             body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ResponsiveContent(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -76,16 +95,26 @@ class _ConfirmEmailViewState extends State<ConfirmEmailView> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.mark_email_read_outlined,
-                              size: 90,
-                              color: AppColors.grey,
+                            Container(
+                              width: 92,
+                              height: 92,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.12,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.mark_email_read_outlined,
+                                size: 46,
+                                color: AppColors.primary,
+                              ),
                             ),
-                            const SizedBox(height: 20),
-                            const Text(
+                            const SizedBox(height: 24),
+                            Text(
                               'Confirm Your Email',
-                              style: TextStyle(
-                                fontSize: 24,
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -103,6 +132,15 @@ class _ConfirmEmailViewState extends State<ConfirmEmailView> {
                               controller: codeController,
                               length: 6,
                               keyboardType: TextInputType.number,
+                              defaultPinTheme: pinTheme,
+                              focusedPinTheme: pinTheme.copyWith(
+                                decoration: pinTheme.decoration?.copyWith(
+                                  border: Border.all(
+                                    color: AppColors.primary,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
                               validator: (value) {
                                 if (value == null || value.length != 6) {
                                   return 'Please enter the 6-digit code';

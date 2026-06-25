@@ -19,40 +19,68 @@ class MainLayout extends StatelessWidget {
       child: BlocBuilder<MainLayoutCubit, MainLayoutState>(
         builder: (context, state) {
           MainLayoutCubit cubit = context.read<MainLayoutCubit>();
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
+          final Color backgroundColor = isDark
+              ? AppColors.backgroundDark
+              : AppColors.background;
+          final Color surfaceColor = isDark
+              ? AppColors.surfaceDark
+              : AppColors.surface;
+          final Color iconColor = isDark
+              ? AppColors.background
+              : AppColors.backgroundDark;
+
           return Scaffold(
+            backgroundColor: backgroundColor,
             appBar: AppBar(
+              backgroundColor: backgroundColor,
               actions: [
-                IconButton(
+                _AppBarAction(
+                  icon: IconBroken.Search,
+                  iconColor: iconColor,
+                  surfaceColor: surfaceColor,
                   onPressed: () {
                     cubit.changeBottomNavBar(2);
                   },
-                  icon: const Icon(IconBroken.Search),
                 ),
-                IconButton(
+                _AppBarAction(
+                  icon: IconBroken.Notification,
+                  iconColor: iconColor,
+                  surfaceColor: surfaceColor,
                   onPressed: () {},
-                  icon: const Icon(IconBroken.Notification),
                 ),
                 BlocProvider(
-                  create:(context) =>  AuthCubit(),
-                  child: BlocConsumer<AuthCubit,AuthState>(
+                  create: (context) => AuthCubit(),
+                  child: BlocConsumer<AuthCubit, AuthState>(
                     listener: (context, state) {
                       if (state is LogoutSucessState) {
-                        showToast(message: 'Logout Successfully', type: ToastType.SUCCESS);
-                        navigateAndFinish(context: context, page: LoginView());
+                        showToast(
+                          message: 'Logout Successfully',
+                          type: ToastType.SUCCESS,
+                        );
+                        navigateAndFinish(
+                          context: context,
+                          page: const LoginView(),
+                        );
                       }
                       if (state is LogoutErrorState) {
-                        showToast(message: 'Logout Failed', type: ToastType.ERROR);
+                        showToast(
+                          message: 'Logout Failed',
+                          type: ToastType.ERROR,
+                        );
                       }
                     },
-                    builder:(context, state) =>  IconButton(
+                    builder: (context, state) => _AppBarAction(
+                      icon: IconBroken.Logout,
+                      iconColor: AppColors.error,
+                      surfaceColor: surfaceColor,
                       onPressed: () {
                         context.read<AuthCubit>().logout();
                       },
-                      icon: const Icon(IconBroken.Logout,color: Colors.red,),
                     ),
                   ),
                 ),
-                
+                const SizedBox(width: 8),
               ],
               title: Container(
                 height: 120,
@@ -75,14 +103,14 @@ class MainLayout extends StatelessWidget {
                 elevation: 0.8,
                 selectedFontSize: 12,
                 backgroundColor: AppColors.primary,
-                selectedItemColor: Colors.white,
-                unselectedItemColor: AppColors.grey,
+                selectedItemColor: AppColors.background,
+                unselectedItemColor: AppColors.background.withValues(alpha: 0.58),
                 showUnselectedLabels: false,
                 currentIndex: cubit.currentIndex,
                 onTap: (index) {
                   cubit.changeBottomNavBar(index);
                 },
-                items:  [
+                items: [
                   BottomNavigationBarItem(
                     icon: AnimatedScale(
                       scale: cubit.currentIndex == 0 ? 1.3 : 1.0,
@@ -95,15 +123,15 @@ class MainLayout extends StatelessWidget {
                     icon: AnimatedScale(
                       scale: cubit.currentIndex == 1 ? 1.3 : 1.0,
                       duration: const Duration(milliseconds: 200),
-                      child: Icon(IconBroken.Calendar)),
+                      child: const Icon(IconBroken.Calendar),
+                    ),
                     label: 'Appointments',
                   ),
                   BottomNavigationBarItem(
                     icon: AnimatedScale(
                       scale: cubit.currentIndex == 2 ? 1.3 : 1.0,
                       duration: const Duration(milliseconds: 200),
-                      child: Icon(IconBroken.Search),
-                    
+                      child: const Icon(IconBroken.Search),
                     ),
                     label: 'Search',
                   ),
@@ -111,7 +139,7 @@ class MainLayout extends StatelessWidget {
                     icon: AnimatedScale(
                       scale: cubit.currentIndex == 3 ? 1.3 : 1.0,
                       duration: const Duration(milliseconds: 200),
-                      child: Icon(IconBroken.Profile),
+                      child: const Icon(IconBroken.Profile),
                     ),
                     label: 'Profile',
                   ),
@@ -139,6 +167,40 @@ class MainLayout extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _AppBarAction extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color surfaceColor;
+  final VoidCallback onPressed;
+
+  const _AppBarAction({
+    required this.icon,
+    required this.iconColor,
+    required this.surfaceColor,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: iconColor, size: 21),
+        ),
       ),
     );
   }

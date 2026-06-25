@@ -18,7 +18,7 @@ class DefaultButton extends StatelessWidget {
     this.width = double.maxFinite,
     this.height = 55,
     this.backgroundColor = AppColors.primary,
-    this.textColor = Colors.white,
+    this.textColor = AppColors.background,
     this.isLoading = false,
     this.prefexIcon,
   });
@@ -28,37 +28,39 @@ class DefaultButton extends StatelessWidget {
     return isLoading
         ? SizedBox(
             height: height,
-            width: double.maxFinite,
-            child: Center(child: CircularProgressIndicator()),
-          )
-        : Container(
-            height: height,
-            width: double.maxFinite,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(14),
+            width: width,
+            child: const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
-            child: Center(
+          )
+        : SizedBox(
+            height: height,
+            width: width,
+            child: Material(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              clipBehavior: Clip.antiAlias,
               child: InkWell(
                 onTap: onPressed,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    prefexIcon != null
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0,
-                            ),
-                            child: prefexIcon,
-                          )
-                        : Container(),
-                    Text(
-                      text,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyLarge?.copyWith(color: textColor),
-                    ),
-                  ],
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (prefexIcon != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: prefexIcon,
+                        ),
+                      Text(
+                        text,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

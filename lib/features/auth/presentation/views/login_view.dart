@@ -6,6 +6,7 @@ import 'package:mishwar/core/utils/navigation.dart';
 import 'package:mishwar/core/utils/toast.dart';
 import 'package:mishwar/core/widgets/default_button.dart';
 import 'package:mishwar/core/widgets/default_text_field.dart';
+import 'package:mishwar/core/widgets/responsive_content.dart';
 import 'package:mishwar/features/auth/presentation/view_model/cubit/auth_cubit.dart';
 import 'package:mishwar/features/auth/presentation/views/signup_view.dart';
 import 'package:mishwar/layouts/presentation/views/main_layout.dart';
@@ -61,46 +62,55 @@ class _LoginViewState extends State<LoginView> {
           final isLoading = state is LoginLoadingState;
 
           return Scaffold(
-            body: Center(
+            body: SafeArea(
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                physics: const BouncingScrollPhysics(),
+                child: ResponsiveContent(
+                  padding: const EdgeInsets.fromLTRB(20, 36, 20, 28),
+                  alignment: Alignment.center,
                   child: Form(
                     key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 50),
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Sign in',
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineLarge,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Please sign in to continue',
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(color: AppColors.grey),
-                                ),
-                              ),
-                            ],
+                        Container(
+                          width: 58,
+                          height: 58,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: const Icon(
+                            Icons.directions_car_filled_rounded,
+                            color: AppColors.primary,
+                            size: 30,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Sign in',
+                          style: Theme.of(context).textTheme.headlineLarge
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Please sign in to continue',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: AppColors.grey,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        const SizedBox(height: 34),
                         DefaultTextField(
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
-                          labelText: 'email',
+                          labelText: 'Email',
+                          prefixIcon: const Icon(
+                            Icons.email_outlined,
+                            color: AppColors.grey,
+                          ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Please enter your email';
@@ -113,7 +123,11 @@ class _LoginViewState extends State<LoginView> {
                           controller: passwordController,
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: hidePassword,
-                          labelText: 'password',
+                          labelText: 'Password',
+                          prefixIcon: const Icon(
+                            Icons.lock_outline_rounded,
+                            color: AppColors.grey,
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your password';
@@ -121,7 +135,6 @@ class _LoginViewState extends State<LoginView> {
                             return null;
                           },
                           suffixIcon: GestureDetector(
-                            child: Icon(suffexIcon),
                             onTap: () {
                               setState(() {
                                 if (hidePassword) {
@@ -133,6 +146,7 @@ class _LoginViewState extends State<LoginView> {
                                 }
                               });
                             },
+                            child: Icon(suffexIcon, color: AppColors.grey),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -162,8 +176,9 @@ class _LoginViewState extends State<LoginView> {
                         const SizedBox(height: 30),
                         DefaultButton(
                           backgroundColor: isDark
-                              ? AppColors.grey
+                              ? AppColors.surfaceDark
                               : AppColors.surfaceDark,
+                          textColor: AppColors.background,
                           text: 'Sign in with Google',
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -176,9 +191,10 @@ class _LoginViewState extends State<LoginView> {
                           },
                           prefexIcon: const FaIcon(
                             FontAwesomeIcons.google,
-                            color: Colors.red,
+                            color: AppColors.error,
                           ),
                         ),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

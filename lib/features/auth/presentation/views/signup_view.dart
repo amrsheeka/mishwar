@@ -6,6 +6,7 @@ import 'package:mishwar/core/utils/navigation.dart';
 import 'package:mishwar/core/utils/toast.dart';
 import 'package:mishwar/core/widgets/default_button.dart';
 import 'package:mishwar/core/widgets/default_text_field.dart';
+import 'package:mishwar/core/widgets/responsive_content.dart';
 import 'package:mishwar/features/auth/presentation/view_model/cubit/auth_cubit.dart';
 import 'package:mishwar/features/auth/presentation/views/confirm_email_view.dart';
 import 'package:mishwar/features/auth/presentation/views/login_view.dart';
@@ -61,7 +62,10 @@ class _SignUpViewState extends State<SignUpView> {
               page: ConfirmEmailView(email: emailController.text.trim()),
               type: PageTransitionType.fade,
             );
-            showToast(message: 'Account created. Confirm your email.', type: ToastType.SUCCESS);
+            showToast(
+              message: 'Account created. Confirm your email.',
+              type: ToastType.SUCCESS,
+            );
           }
 
           if (state is SignupErrorState) {
@@ -72,46 +76,55 @@ class _SignUpViewState extends State<SignUpView> {
           final isLoading = state is SignupLoadingState;
 
           return Scaffold(
-            body: Center(
+            body: SafeArea(
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                physics: const BouncingScrollPhysics(),
+                child: ResponsiveContent(
+                  padding: const EdgeInsets.fromLTRB(20, 30, 20, 28),
+                  alignment: Alignment.center,
                   child: Form(
                     key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 50),
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Sign up',
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineLarge,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Please sign up to continue',
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(color: AppColors.grey),
-                                ),
-                              ),
-                            ],
+                        Container(
+                          width: 58,
+                          height: 58,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: const Icon(
+                            Icons.person_add_alt_1_rounded,
+                            color: AppColors.primary,
+                            size: 30,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Sign up',
+                          style: Theme.of(context).textTheme.headlineLarge
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Please sign up to continue',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: AppColors.grey,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        const SizedBox(height: 30),
                         DefaultTextField(
                           controller: nameController,
                           keyboardType: TextInputType.name,
-                          labelText: 'name',
+                          labelText: 'Name',
+                          prefixIcon: const Icon(
+                            Icons.person_outline_rounded,
+                            color: AppColors.grey,
+                          ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Please enter your name';
@@ -123,7 +136,11 @@ class _SignUpViewState extends State<SignUpView> {
                         DefaultTextField(
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
-                          labelText: 'email',
+                          labelText: 'Email',
+                          prefixIcon: const Icon(
+                            Icons.email_outlined,
+                            color: AppColors.grey,
+                          ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Please enter your email';
@@ -136,7 +153,11 @@ class _SignUpViewState extends State<SignUpView> {
                           controller: passwordController,
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: hidePassword,
-                          labelText: 'password',
+                          labelText: 'Password',
+                          prefixIcon: const Icon(
+                            Icons.lock_outline_rounded,
+                            color: AppColors.grey,
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a password';
@@ -147,7 +168,6 @@ class _SignUpViewState extends State<SignUpView> {
                             return null;
                           },
                           suffixIcon: GestureDetector(
-                            child: Icon(suffexIcon),
                             onTap: () {
                               setState(() {
                                 if (hidePassword) {
@@ -159,6 +179,7 @@ class _SignUpViewState extends State<SignUpView> {
                                 }
                               });
                             },
+                            child: Icon(suffexIcon, color: AppColors.grey),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -166,7 +187,11 @@ class _SignUpViewState extends State<SignUpView> {
                           controller: confirmPasswordController,
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: hidePassword,
-                          labelText: 'confirm password',
+                          labelText: 'Confirm password',
+                          prefixIcon: const Icon(
+                            Icons.lock_outline_rounded,
+                            color: AppColors.grey,
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please confirm your password';
@@ -177,7 +202,6 @@ class _SignUpViewState extends State<SignUpView> {
                             return null;
                           },
                           suffixIcon: GestureDetector(
-                            child: Icon(suffexIcon),
                             onTap: () {
                               setState(() {
                                 if (hidePassword) {
@@ -189,9 +213,9 @@ class _SignUpViewState extends State<SignUpView> {
                                 }
                               });
                             },
+                            child: Icon(suffexIcon, color: AppColors.grey),
                           ),
                         ),
-                        const SizedBox(height: 10),
                         const SizedBox(height: 20),
                         DefaultButton(
                           text: 'Sign up',
@@ -203,8 +227,9 @@ class _SignUpViewState extends State<SignUpView> {
                         const SizedBox(height: 30),
                         DefaultButton(
                           backgroundColor: isDark
-                              ? AppColors.grey
+                              ? AppColors.surfaceDark
                               : AppColors.surfaceDark,
+                          textColor: AppColors.background,
                           text: 'Sign in with Google',
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -217,9 +242,10 @@ class _SignUpViewState extends State<SignUpView> {
                           },
                           prefexIcon: const FaIcon(
                             FontAwesomeIcons.google,
-                            color: Colors.red,
+                            color: AppColors.error,
                           ),
                         ),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

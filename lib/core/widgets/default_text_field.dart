@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mishwar/core/styles/app_colors.dart';
 
 class DefaultTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -30,6 +31,9 @@ class DefaultTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color fillColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -45,6 +49,9 @@ class DefaultTextField extends StatelessWidget {
         suffixIcon: suffixIcon,
 
         filled: true,
+        fillColor: fillColor,
+        hintStyle: const TextStyle(color: AppColors.grey),
+        labelStyle: const TextStyle(color: AppColors.grey),
 
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -61,10 +68,15 @@ class DefaultTextField extends StatelessWidget {
           borderSide: BorderSide.none,
         ),
 
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color: Theme.of(context).primaryColor,
+            color: AppColors.primary,
             width: 2,
           ),
         ),

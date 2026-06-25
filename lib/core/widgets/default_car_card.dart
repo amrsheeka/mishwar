@@ -38,32 +38,41 @@ class DefaultCarCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
+      borderRadius: BorderRadius.circular(18),
       onTap: () {
-        navigateTo(context: context, page: CarDetailsView(id: id,));
+        navigateTo(context: context, page: CarDetailsView(id: id));
       },
-      child: Card(
+      child: Container(
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        color: isDark?AppColors.surfaceDark: AppColors.background,
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.surfaceDark
+              : AppColors.surface.withValues(alpha: 0.42),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.10),
+          ),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
                 clipBehavior: Clip.antiAlias,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
                   height: 180,
                   width: double.maxFinite,
                   fit: BoxFit.cover,
                   placeholder: (context, url) =>
-                      Container(color: AppColors.grey.withValues(alpha: 0.3)),
+                      Container(color: AppColors.grey.withValues(alpha: 0.18)),
                   errorWidget: (context, url, error) =>
                       Image.asset(defaultImage),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -74,62 +83,68 @@ class DefaultCarCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           '$brandName $model $year',
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w800),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: AppColors.rating),
-                          SizedBox(width: 5,),
-                          Text(reviewsAvgRating.toStringAsFixed(1)),
-                        ],
+
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.rating.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              color: AppColors.rating,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              reviewsAvgRating.toStringAsFixed(1),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 5,),
+                  const SizedBox(height: 10),
                   Row(
-                    
                     children: [
-                      Icon(Icons.chair_sharp, color: AppColors.secondary),
-                      const SizedBox(width: 5,),
-                      Text(
-                        '$seats',
-                        style: Theme.of(context).textTheme.titleMedium,
+                      _CarMetaItem(
+                        icon: Icons.chair_sharp,
+                        label: '$seats',
                       ),
-                      // const Spacer(),
-                      // Icon(Icons.propane_tank_sharp, color: AppColors.secondary),
-      
-                      // Text(
-                      //   fuelType,
-                      //   style: Theme.of(context).textTheme.titleMedium,
-                      //   maxLines: 1,
-                      //   overflow: TextOverflow.ellipsis,
-                      // ),
-                      const SizedBox(width: 20,),
-                      Icon(Icons.drive_eta_sharp, color: AppColors.secondary),
-                      const SizedBox(width: 5,),
-                      Text(
-                        transmission,
-                        style: Theme.of(context).textTheme.titleMedium,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _CarMetaItem(
+                          icon: Icons.drive_eta_sharp,
+                          label: transmission,
+                        ),
                       ),
                       const Spacer(),
                       Text(
-                        '\$ ',
+                        '\$$pricePerDay',
                         style: Theme.of(
                           context,
-                        ).textTheme.titleMedium?.copyWith(color: Colors.green),
-                      ),
-      
-                      Text(
-                        '$pricePerDay',
-                        style: Theme.of(context).textTheme.titleMedium,
+                        ).textTheme.titleMedium?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                       Text(
                         ' /d',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.grey),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: AppColors.grey),
                       ),
                     ],
                   ),
@@ -139,6 +154,35 @@ class DefaultCarCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CarMetaItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _CarMetaItem({
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: AppColors.secondary, size: 20),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
 import 'package:mishwar/core/styles/icon_broken.dart';
 import 'package:mishwar/core/widgets/default_car_card.dart';
+import 'package:mishwar/core/widgets/default_text_field.dart';
 import 'package:mishwar/features/home/cubits/home_cubit.dart';
 import 'package:mishwar/features/home/cubits/home_state.dart';
 import 'package:mishwar/features/home/views/widgets/brand_item.dart';
@@ -42,52 +43,73 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 10, left: 10),
+    final Color backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.background;
+    final Color surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surface;
+    return ColoredBox(
+      color: backgroundColor,
       child: CustomScrollView(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         slivers: [
           /// HEADER
           SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                Text(
-                  'Welcome back, User!',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 16),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Welcome back, User!',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Find a ride that fits your next trip.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                ],
+              ),
             ),
           ),
 
           /// SEARCH BAR
           SliverToBoxAdapter(
-            child: InkWell(
-              onTap: () {
-                context.read<MainLayoutCubit>().changeBottomNavBar(2);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                height: 50,
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(IconBroken.Search, color: AppColors.grey),
-                    SizedBox(width: 10),
-                    Text('Search', style: TextStyle(color: AppColors.grey)),
-                  ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Material(
+                color: AppColors.backgroundDark.withValues(alpha: 0),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    context.read<MainLayoutCubit>().changeBottomNavBar(2);
+                  },
+                  child: IgnorePointer(
+                    child: DefaultTextField(
+                      controller: null,
+                      enabled: false,
+                      hintText: 'Search',
+                      prefixIcon: const Icon(
+                        IconBroken.Search,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
           /// CAROUSEL + INDICATOR
           BlocBuilder<HomeCubit, HomeState>(
@@ -99,53 +121,80 @@ class _HomeViewState extends State<HomeView> {
               return SliverToBoxAdapter(
                 child: Skeletonizer(
                   enabled: isLoading,
-                  child: Column(
-                    children: [
-                      /// CAROUSEL
-                      CarouselSlider(
-                        items: cubit.slider.map((e) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: CachedNetworkImage(
-                              imageUrl: e,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                color: AppColors.grey.withValues(alpha: 0.3),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        /// CAROUSEL
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(22),
+                          child: CarouselSlider(
+                            items: cubit.slider.map((e) {
+                              return Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl: e,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      color: surfaceColor,
+                                    ),
+                                    errorWidget: (context, url, error) => Icon(
+                                      Icons.error_outline_rounded,
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                  DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          AppColors.backgroundDark.withValues(
+                                            alpha: 0,
+                                          ),
+                                          AppColors.backgroundDark.withValues(
+                                            alpha: 0.24,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                            options: CarouselOptions(
+                              autoPlay: false,
+                              viewportFraction: 1.0,
+                              aspectRatio: 1.9,
+                              autoPlayInterval: const Duration(seconds: 3),
+                              autoPlayAnimationDuration: const Duration(
+                                milliseconds: 800,
                               ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error, color: Colors.red),
+                              onPageChanged: (index, reason) {
+                                cubit.changeSliderIndex(index);
+                              },
                             ),
-                          );
-                        }).toList(),
-                        options: CarouselOptions(
-                          autoPlay: false,
-                          viewportFraction: 1.0,
-                          aspectRatio: 1.9,
-                          autoPlayInterval: const Duration(seconds: 3),
-                          autoPlayAnimationDuration: const Duration(
-                            milliseconds: 800,
                           ),
-                          onPageChanged: (index, reason) {
-                            cubit.changeSliderIndex(index);
-                          },
                         ),
-                      ),
 
-                      const SizedBox(height: 10),
+                        const SizedBox(height: 10),
 
-                      /// INDICATOR (separate rebuild)
-                      AnimatedSmoothIndicator(
-                        activeIndex: cubit.sliderIndex,
-                        count: cubit.slider.isEmpty ? 1 : cubit.slider.length,
-                        effect: ExpandingDotsEffect(
-                          dotHeight: 8,
-                          dotWidth: 8,
-                          activeDotColor: AppColors.primary,
+                        /// INDICATOR (separate rebuild)
+                        AnimatedSmoothIndicator(
+                          activeIndex: cubit.sliderIndex,
+                          count: cubit.slider.isEmpty ? 1 : cubit.slider.length,
+                          effect: const ExpandingDotsEffect(
+                            dotHeight: 8,
+                            dotWidth: 8,
+                            activeDotColor: AppColors.primary,
+                            dotColor: AppColors.surface,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                        const SizedBox(height: 18),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -153,10 +202,14 @@ class _HomeViewState extends State<HomeView> {
           ),
           SliverAppBar(
             pinned: true,
-            expandedHeight: 40.0,
+            expandedHeight: 58.0,
+            backgroundColor: backgroundColor,
+            elevation: 0,
             titleSpacing: 0,
-            title: SizedBox(
-              height: 40,
+            title: Container(
+              height: 58,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              color: backgroundColor,
               child: BlocBuilder<HomeCubit, HomeState>(
                 builder: (context, state) {
                   final cubit = context.read<HomeCubit>();
@@ -168,22 +221,25 @@ class _HomeViewState extends State<HomeView> {
 
                   return Skeletonizer(
                     enabled: isLoading,
-                    child: ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        final brand = isLoading
-                            ? null
-                            : cubit.brandsModel?.brands[index];
-                        return BrandItem(
-                          id: cubit.brandsModel?.brands[index].id??1,
-                          index: index,
-                          imageUrl: brand?.logo ?? '',
-                        );
-                      },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 10),
-                      itemCount: itemCount,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final brand = isLoading
+                              ? null
+                              : cubit.brandsModel?.brands[index];
+                          return BrandItem(
+                            id: cubit.brandsModel?.brands[index].id ?? 1,
+                            index: index,
+                            imageUrl: brand?.logo ?? '',
+                          );
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 10),
+                        itemCount: itemCount,
+                      ),
                     ),
                   );
                 },
@@ -191,90 +247,135 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
           SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Featured Cars',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {},
-                      child: Row(
-                        children: [
-                          const Text('See All'),
-                          Icon(IconBroken.Arrow___Right_2, size: 16),
-                        ],
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                BlocBuilder<HomeCubit, HomeState>(
-                  builder: (context, state) {
-                    final cubit = context.read<HomeCubit>();
+                      const SizedBox(width: 10),
+                      Text(
+                        'Featured Cars',
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('See All'),
+                            Icon(IconBroken.Arrow___Right_2, size: 16),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  BlocBuilder<HomeCubit, HomeState>(
+                    builder: (context, state) {
+                      final cubit = context.read<HomeCubit>();
 
-                    final isInitialLoading =
-                        state is GetFeaturedCarsLoadingState;
+                      final isInitialLoading =
+                          state is GetFeaturedCarsLoadingState;
 
-                    final isLoadingMore =
-                        state is GetMoreFeaturedCarsLoadingState;
+                      final isLoadingMore =
+                          state is GetMoreFeaturedCarsLoadingState;
 
-                    final cars = cubit.featuredCarsModel?.cars.data ?? [];
+                      final cars = cubit.featuredCarsModel?.cars.data ?? [];
+                      final itemCount = isInitialLoading
+                          ? 5
+                          : cars.length + (isLoadingMore ? 1 : 0);
 
-                    return Skeletonizer(
-                      enabled: isInitialLoading,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: isInitialLoading
-                            ? 5
-                            : cars.length + (isLoadingMore ? 1 : 0),
-                        separatorBuilder: (_, _) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          if (isLoadingMore && index == cars.length) {
-                            return Skeletonizer(
-                              enabled: true,
-                              child: const DefaultCarCard(
-                                id: 0,
-                                index: -1,
-                                imageUrl: '',
-                                brandName: 'Brand',
-                                model: 'Model',
-                                year: '2026',
-                                seats: 4,
-                                fuelType: 'Fuel',
-                                transmission: 'Auto',
-                                pricePerDay: 0,
-                                reviewsAvgRating: 0,
-                              ),
-                            );
-                          }
-
-                          final car = isInitialLoading ? null : cars[index];
-
-                          return DefaultCarCard(
-                            id: car?.id??0,
-                            index: index,
-                            imageUrl: car?.primaryImage.imageUrl ?? '',
-                            brandName: car?.brand.name ?? 'Brand',
-                            model: car?.model ?? 'Model',
-                            year: car?.year ?? '2026',
-                            seats: car?.seats ?? 4,
-                            fuelType: car?.fuelType ?? 'Fuel',
-                            transmission: car?.transmission ?? 'Auto',
-                            pricePerDay: car?.pricePerDay ?? 0,
-                            reviewsAvgRating: car?.reviewsAvgRating??0,
+                      Widget buildCarCard(int index) {
+                        if (isLoadingMore && index == cars.length) {
+                          return Skeletonizer(
+                            enabled: true,
+                            child: const DefaultCarCard(
+                              id: 0,
+                              index: -1,
+                              imageUrl: '',
+                              brandName: 'Brand',
+                              model: 'Model',
+                              year: '2026',
+                              seats: 4,
+                              fuelType: 'Fuel',
+                              transmission: 'Auto',
+                              pricePerDay: 0,
+                              reviewsAvgRating: 0,
+                            ),
                           );
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
+                        }
+
+                        final car = isInitialLoading ? null : cars[index];
+
+                        return DefaultCarCard(
+                          id: car?.id ?? 0,
+                          index: index,
+                          imageUrl: car?.primaryImage.imageUrl ?? '',
+                          brandName: car?.brand.name ?? 'Brand',
+                          model: car?.model ?? 'Model',
+                          year: car?.year ?? '2026',
+                          seats: car?.seats ?? 4,
+                          fuelType: car?.fuelType ?? 'Fuel',
+                          transmission: car?.transmission ?? 'Auto',
+                          pricePerDay: car?.pricePerDay ?? 0,
+                          reviewsAvgRating: car?.reviewsAvgRating ?? 0,
+                        );
+                      }
+
+                      return Skeletonizer(
+                        enabled: isInitialLoading,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final int crossAxisCount =
+                                constraints.maxWidth >= 720 ? 2 : 1;
+
+                            if (crossAxisCount == 1) {
+                              return ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: itemCount,
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(height: 12),
+                                itemBuilder: (context, index) =>
+                                    buildCarCard(index),
+                              );
+                            }
+
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: itemCount,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 14,
+                                    mainAxisSpacing: 14,
+                                    childAspectRatio: 1.05,
+                                  ),
+                              itemBuilder: (context, index) =>
+                                  buildCarCard(index),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],
