@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
 import 'package:mishwar/core/utils/navigation.dart';
+import 'package:mishwar/core/utils/toast.dart';
 import 'package:mishwar/core/widgets/default_button.dart';
 import 'package:mishwar/core/widgets/default_text_field.dart';
 import 'package:mishwar/features/auth/presentation/view_model/cubit/auth_cubit.dart';
@@ -60,17 +61,11 @@ class _SignUpViewState extends State<SignUpView> {
               page: ConfirmEmailView(email: emailController.text.trim()),
               type: PageTransitionType.fade,
             );
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Account created. Confirm your email.'),
-              ),
-            );
+            showToast(message: 'Account created. Confirm your email.', type: ToastType.SUCCESS);
           }
 
           if (state is SignupErrorState) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            showToast(message: state.message, type: ToastType.ERROR);
           }
         },
         builder: (context, state) {

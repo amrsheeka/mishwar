@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
 import 'package:mishwar/core/widgets/default_car_card.dart';
+import 'package:mishwar/features/home/data/models/featured_cars_model.dart';
 import 'package:mishwar/features/search/cubits/search/search_cubit.dart';
 import 'package:mishwar/features/search/cubits/search/search_state.dart';
 import 'package:mishwar/features/search/data/models/car_search_params.dart';
-import 'package:mishwar/features/search/data/models/search_results_model.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class SearchResultsView extends StatefulWidget {
@@ -92,6 +92,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
                             fuelType: 'Fuel',
                             transmission: 'Auto',
                             pricePerDay: 0,
+                            reviewsAvgRating: 0,
                           ),
                         );
                       }
@@ -109,6 +110,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
                         fuelType: car?.fuelType ?? 'Fuel',
                         transmission: car?.transmission ?? 'Auto',
                         pricePerDay: car?.pricePerDay ?? 0,
+                        reviewsAvgRating: car?.reviewsAvgRating??0,
                       );
                     },
                   ),

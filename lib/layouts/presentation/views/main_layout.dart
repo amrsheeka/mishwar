@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
 import 'package:mishwar/core/styles/icon_broken.dart';
+import 'package:mishwar/core/utils/navigation.dart';
+import 'package:mishwar/core/utils/toast.dart';
+import 'package:mishwar/features/auth/presentation/view_model/cubit/auth_cubit.dart';
+import 'package:mishwar/features/auth/presentation/views/login_view.dart';
 import 'package:mishwar/layouts/presentation/view_model/cubits/main_layout/main_layout_cubit.dart';
 import 'package:mishwar/layouts/presentation/view_model/cubits/main_layout/main_layout_state.dart';
 
@@ -27,6 +31,26 @@ class MainLayout extends StatelessWidget {
                 IconButton(
                   onPressed: () {},
                   icon: const Icon(IconBroken.Notification),
+                ),
+                BlocProvider(
+                  create:(context) =>  AuthCubit(),
+                  child: BlocConsumer<AuthCubit,AuthState>(
+                    listener: (context, state) {
+                      if (state is LogoutSucessState) {
+                        showToast(message: 'Logout Successfully', type: ToastType.SUCCESS);
+                        navigateAndFinish(context: context, page: LoginView());
+                      }
+                      if (state is LogoutErrorState) {
+                        showToast(message: 'Logout Failed', type: ToastType.ERROR);
+                      }
+                    },
+                    builder:(context, state) =>  IconButton(
+                      onPressed: () {
+                        context.read<AuthCubit>().logout();
+                      },
+                      icon: const Icon(IconBroken.Logout,color: Colors.red,),
+                    ),
+                  ),
                 ),
                 
               ],

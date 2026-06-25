@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:mishwar/core/models/car.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
+import 'package:mishwar/core/styles/icon_broken.dart';
 
 Widget quickInfoCard({required Car? car}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        "${car?.brand.name} ${car?.model} (${car?.year})",
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
+      Row(
+        children: [
+          Expanded(
+            child: Text(
+              "${car?.brand.name} ${car?.model} (${car?.year})",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Row(
+            children: [
+              Icon(Icons.star, color: AppColors.rating),
+              SizedBox(width: 5,),
+              Text('${car?.reviewsAvgRating.toStringAsFixed(1)}'),
+            ],
+          ),
+        ],
       ),
       const SizedBox(height: 8),
-    
+
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -39,10 +50,7 @@ Widget quickInfoCard({required Car? car}) {
             ],
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: car?.status == "available"
                   ? Colors.green.withOpacity(0.2)

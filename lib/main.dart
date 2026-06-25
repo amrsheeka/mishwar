@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
+import 'package:mishwar/core/utils/cach_helper.dart';
 import 'package:mishwar/core/utils/dio_helper.dart';
+import 'package:mishwar/features/auth/presentation/views/login_view.dart';
+import 'package:mishwar/features/auth/presentation/views/signup_view.dart';
 // import 'package:mishwar/core/utils/services.dart';
 
 import 'package:mishwar/layouts/presentation/views/main_layout.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   DioHelper.init();
-  runApp(const MyApp());
+  
+  await CacheHelper.init();
+  String? token = CacheHelper.getData(key: 'token');
+  runApp(MyApp(token: token,));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+  final String? token;
+  const MyApp({super.key,required this.token});
+  
   @override
   Widget build(BuildContext context) {
+    final Widget initialScreen;
+    if(token==null){
+      initialScreen = LoginView();
+    }else{
+      initialScreen = MainLayout();
+    }
     return MaterialApp(
       title: 'Mishwar',
       debugShowCheckedModeBanner: false,
@@ -86,7 +101,7 @@ class MyApp extends StatelessWidget {
       // Use system theme
       themeMode: ThemeMode.light,
 
-      home: MainLayout(),
+      home: initialScreen,
     );
   }
 }

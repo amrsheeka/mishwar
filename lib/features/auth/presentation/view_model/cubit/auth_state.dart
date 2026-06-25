@@ -34,3 +34,13 @@ final class EmailConfirmationErrorState extends AuthState {
   final String message;
   EmailConfirmationErrorState(this.message);
 }
+
+//logout
+final class LogoutSucessState extends AuthState {}
+
+final class LogoutErrorState extends AuthState {
+  final String message;
+  LogoutErrorState(this.message);
+}
+
+

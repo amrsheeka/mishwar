@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mishwar/core/utils/cach_helper.dart';
+import 'package:mishwar/features/auth/data/models/auth_response_model.dart';
 import 'package:mishwar/features/auth/data/services/auth_service.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit({AuthService? authService})
-    : _authService = authService ?? AuthService(),
-      super(AuthInitial());
-
-  final AuthService _authService;
-
+  AuthCubit() : super(AuthInitial());
   Future<void> login({required String email, required String password}) async {
     emit(LoginLoadingState());
 
     try {
-      await _authService.login(email: email, password: password);
+      final AuthResponseModel result = await AuthService.login(
+        email: email,
+        password: password,
+      );
+
+      await CacheHelper.saveData(key: 'token', value: result.token);
+
       emit(LoginSuccessState());
-    } on AuthException catch (error) {
-      emit(LoginErrorState(error.message));
-    } catch (error) {
-      emit(LoginErrorState(error.toString()));
+    } catch (e) {
+      emit(LoginErrorState(e.toString()));
     }
   }
 
@@ -32,18 +33,21 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(SignupLoadingState());
 
-    try {
-      await _authService.register(
-        name: name,
-        email: email,
-        password: password,
-        passwordConfirmation: passwordConfirmation,
-      );
-      emit(SignupSuccessState());
-    } on AuthException catch (error) {
-      emit(SignupErrorState(error.message));
-    } catch (error) {
-      emit(SignupErrorState(error.toString()));
+    final result = await AuthService.register(
+      name: name,
+      email: email,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+    );
+
+    if (result != null) {
+      if (result == 'Account created. Confirm your email') {
+        emit(SignupSuccessState());
+      } else {
+        emit(SignupErrorState(result));
+      }
+    } else {
+      emit(SignupErrorState('Unexpected error'));
     }
   }
 
@@ -54,10 +58,12 @@ class AuthCubit extends Cubit<AuthState> {
     emit(EmailConfirmationLoadingState());
 
     try {
-      await _authService.confirmEmail(email: email, code: code);
+      final AuthResponseModel result = await AuthService.confirmEmail(
+        email: email,
+        code: code,
+      );
+      await CacheHelper.saveData(key: 'token', value: result.token);
       emit(EmailConfirmationSuccessState());
-    } on AuthException catch (error) {
-      emit(EmailConfirmationErrorState(error.message));
     } catch (error) {
       emit(EmailConfirmationErrorState(error.toString()));
     }
@@ -65,12 +71,10 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> logout() async {
     try {
-      await _authService.logout();
-      emit(AuthInitial());
-    } on AuthException catch (error) {
-      emit(LoginErrorState(error.message));
+      await AuthService.logout();
+      emit(LogoutSucessState());
     } catch (error) {
-      emit(LoginErrorState(error.toString()));
+      emit(LogoutErrorState(error.toString()));
     }
   }
 }

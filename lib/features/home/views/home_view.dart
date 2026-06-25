@@ -249,6 +249,7 @@ class _HomeViewState extends State<HomeView> {
                                 fuelType: 'Fuel',
                                 transmission: 'Auto',
                                 pricePerDay: 0,
+                                reviewsAvgRating: 0,
                               ),
                             );
                           }
@@ -266,6 +267,7 @@ class _HomeViewState extends State<HomeView> {
                             fuelType: car?.fuelType ?? 'Fuel',
                             transmission: car?.transmission ?? 'Auto',
                             pricePerDay: car?.pricePerDay ?? 0,
+                            reviewsAvgRating: car?.reviewsAvgRating??0,
                           );
                         },
                       ),

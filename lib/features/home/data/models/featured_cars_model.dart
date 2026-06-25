@@ -128,8 +128,8 @@ class Data {
     branch = Branch.fromJson(json['branch']);
     primaryImage = PrimaryImage.fromJson(json['primary_image']);
     brand = Brand.fromJson(json['brand']);
-    reviewsCount = json['revewis_count'];
-    reviewsAvgRating = double.parse(json['reviews_avg_rating']);
+    reviewsCount = json['revewis_count']??0;
+    reviewsAvgRating = double.parse(json['reviews_avg_rating']??'0');
   }
 
   Map<String, dynamic> toJson() {

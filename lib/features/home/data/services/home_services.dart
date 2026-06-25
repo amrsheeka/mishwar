@@ -4,12 +4,17 @@ import 'package:mishwar/features/home/data/models/brands_model.dart';
 
 class HomeServices {
   static Future<FeaturedCarsModel?> getFeaturedCars() async {
-    final response = await DioHelper.getData(url: 'cars');
+    try{
+      final response = await DioHelper.getData(url: 'cars');
     if (response.statusCode == 200) {
       return FeaturedCarsModel.fromJson(response.data);
     } else {
       return null;
     }
+    }catch(e){
+      rethrow;
+    }
+    
   }
 
   static Future<FeaturedCarsModel?> getMoreFeaturedCars(
@@ -27,6 +32,7 @@ class HomeServices {
 
       return null;
     } catch (e, s) {
+      
       rethrow;
     }
   }

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
 import 'package:mishwar/core/utils/navigation.dart';
+import 'package:mishwar/core/utils/toast.dart';
 import 'package:mishwar/core/widgets/default_back_button.dart';
 import 'package:mishwar/core/widgets/default_button.dart';
 import 'package:mishwar/core/widgets/default_text_field.dart';
 import 'package:mishwar/features/auth/presentation/view_model/cubit/auth_cubit.dart';
 import 'package:mishwar/features/auth/presentation/views/login_view.dart';
+import 'package:mishwar/layouts/presentation/views/main_layout.dart';
+import 'package:pinput/pinput.dart';
 
 class ConfirmEmailView extends StatefulWidget {
   const ConfirmEmailView({super.key, required this.email});
@@ -43,22 +46,16 @@ class _ConfirmEmailViewState extends State<ConfirmEmailView> {
       child: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is EmailConfirmationSuccessState) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Email confirmed successfully. Please sign in.'),
-              ),
-            );
+            showToast(message: 'Logout Successfully!', type: ToastType.SUCCESS);
             navigateAndFinish(
               context: context,
-              page: const LoginView(),
+              page: const MainLayout(),
               type: PageTransitionType.fade,
             );
           }
 
           if (state is EmailConfirmationErrorState) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            showToast(message: state.message, type: ToastType.ERROR);
           }
         },
         builder: (context, state) {
@@ -102,13 +99,13 @@ class _ConfirmEmailViewState extends State<ConfirmEmailView> {
                               ),
                             ),
                             const SizedBox(height: 40),
-                            DefaultTextField(
+                            Pinput(
                               controller: codeController,
+                              length: 6,
                               keyboardType: TextInputType.number,
-                              labelText: 'verification code',
                               validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Please enter the verification code';
+                                if (value == null || value.length != 6) {
+                                  return 'Please enter the 6-digit code';
                                 }
                                 return null;
                               },

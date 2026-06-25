@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mishwar/core/styles/app_colors.dart';
 import 'package:mishwar/core/utils/navigation.dart';
+import 'package:mishwar/core/utils/toast.dart';
 import 'package:mishwar/core/widgets/default_button.dart';
 import 'package:mishwar/core/widgets/default_text_field.dart';
 import 'package:mishwar/features/auth/presentation/view_model/cubit/auth_cubit.dart';
 import 'package:mishwar/features/auth/presentation/views/signup_view.dart';
+import 'package:mishwar/layouts/presentation/views/main_layout.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -47,15 +49,12 @@ class _LoginViewState extends State<LoginView> {
       child: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is LoginSuccessState) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Signed in successfully.')),
-            );
+            showToast(message: 'Login Successfully!', type: ToastType.SUCCESS);
+            navigateAndFinish(context: context, page: MainLayout());
           }
 
           if (state is LoginErrorState) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            showToast(message: state.message, type: ToastType.ERROR);
           }
         },
         builder: (context, state) {

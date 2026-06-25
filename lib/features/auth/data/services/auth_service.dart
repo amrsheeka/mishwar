@@ -1,37 +1,40 @@
 import 'package:dio/dio.dart';
-import 'package:mishwar/core/utils/services.dart';
+import 'package:mishwar/core/utils/cach_helper.dart';
+import 'package:mishwar/core/utils/dio_helper.dart';
+import 'package:mishwar/features/auth/data/models/auth_response_model.dart';
 
 class AuthService {
-  AuthService({ApiService? apiService})
-    : _apiService = apiService ?? ApiService.instance;
+  static Future<void> logout() async {
+  try {
+    await DioHelper.postData(url: 'logout');
 
-  final ApiService _apiService;
+    await CacheHelper.removeData(key: 'token');
+  } on DioException catch (e) {
+    throw e.response?.data['message'] ?? 'Failed to logout';
+  }
+}
 
-  Future<Map<String, dynamic>> login({
+  static Future<AuthResponseModel> confirmEmail({
     required String email,
-    required String password,
+    required String code,
   }) async {
-    try {
-      final response = await _apiService.post<Map<String, dynamic>>(
-        'login',
-        data: {'email': email, 'password': password},
-      );
+    final response = await DioHelper.postData(
+      url: 'verify-email',
+      data: {'email': email, 'otp': code},
+    );
 
-      return _decodeResponse(response);
-    } on DioException catch (error) {
-      throw AuthException.fromDio(error);
-    }
+    return AuthResponseModel.fromJson(response.data);
   }
 
-  Future<Map<String, dynamic>> register({
+  static Future<String?> register({
     required String name,
     required String email,
     required String password,
     required String passwordConfirmation,
   }) async {
     try {
-      final response = await _apiService.post<Map<String, dynamic>>(
-        'register',
+      final response = await DioHelper.postData(
+        url: 'register',
         data: {
           'name': name,
           'email': email,
@@ -40,75 +43,36 @@ class AuthService {
         },
       );
 
-      return _decodeResponse(response);
-    } on DioException catch (error) {
-      throw AuthException.fromDio(error);
+      if (response.statusCode == 201) {
+        return 'Account created. Confirm your email';
+      }
+
+      return null;
+    } on DioException catch (e) {
+      print('Error: ${e.response?.data['message']}');
+      return e.response?.data['message'] ?? 'This email is already used';
+    } catch (e) {
+      print('Error: $e');
+      return 'Something went wrong';
     }
   }
 
-  Future<Map<String, dynamic>> confirmEmail({
+  static Future<AuthResponseModel> login({
     required String email,
-    required String code,
+    required String password,
   }) async {
     try {
-      final response = await _apiService.post<Map<String, dynamic>>(
-        'verify-email-otp',
-        data: {'email': email, 'otp': code},
+      final response = await DioHelper.postData(
+        url: 'login',
+        data: {'email': email, 'password': password},
       );
+      return AuthResponseModel.fromJson(response.data);
+    } on DioException catch (e) {
+      final data = e.response?.data;
 
-      return _decodeResponse(response);
-    } on DioException catch (error) {
-      throw AuthException.fromDio(error);
+      throw Exception(data['message'] ?? 'Login failed');
+    } catch (e) {
+      throw Exception('Something went wrong');
     }
-  }
-
-  Future<void> logout() async {
-    try {
-      await _apiService.post('logout');
-    } on DioException catch (error) {
-      throw AuthException.fromDio(error);
-    }
-  }
-
-  Map<String, dynamic> _decodeResponse(Response<dynamic> response) {
-    if (response.data is Map<String, dynamic>) {
-      return response.data as Map<String, dynamic>;
-    }
-
-    return {'statusCode': response.statusCode, 'data': response.data};
-  }
-}
-
-class AuthException implements Exception {
-  AuthException(this.message, {this.statusCode});
-
-  final String message;
-  final int? statusCode;
-
-  @override
-  String toString() =>
-      'AuthException(statusCode: $statusCode, message: $message)';
-
-  factory AuthException.fromDio(DioException error) {
-    final response = error.response;
-    final statusCode = response?.statusCode;
-    final message = _extractMessage(error, response);
-
-    return AuthException(message, statusCode: statusCode);
-  }
-
-  static String _extractMessage(
-    DioException error,
-    Response<dynamic>? response,
-  ) {
-    if (response?.data is Map<String, dynamic>) {
-      final data = response?.data as Map<String, dynamic>;
-
-      if (data.containsKey('message')) {
-        return data['message'].toString();
-      }
-    }
-
-    return error.message ?? 'An unknown authentication error occurred.';
   }
 }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:mishwar/core/utils/cach_helper.dart';
 
 class DioHelper {
   static late Dio dio;
@@ -19,11 +20,16 @@ class DioHelper {
     );
 
     dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestBody: true,
-        responseBody: true,
-        error: true,
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final token = CacheHelper.getData(key: 'token');
+
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+
+          handler.next(options);
+        },
       ),
     );
   }

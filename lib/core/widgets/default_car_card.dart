@@ -17,6 +17,7 @@ class DefaultCarCard extends StatelessWidget {
   final String fuelType;
   final String transmission;
   final double pricePerDay;
+  final double reviewsAvgRating;
   const DefaultCarCard({
     super.key,
     required this.id,
@@ -29,6 +30,7 @@ class DefaultCarCard extends StatelessWidget {
     required this.fuelType,
     required this.transmission,
     required this.pricePerDay,
+    required this.reviewsAvgRating
   });
 
 
@@ -80,20 +82,19 @@ class DefaultCarCard extends StatelessWidget {
                       
                       Row(
                         children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(IconBroken.Star, color: AppColors.rating),
-                          ),
-                          Text('0.0'),
+                          Icon(Icons.star, color: AppColors.rating),
+                          SizedBox(width: 5,),
+                          Text(reviewsAvgRating.toStringAsFixed(1)),
                         ],
                       ),
                     ],
                   ),
+                  SizedBox(height: 5,),
                   Row(
                     
                     children: [
                       Icon(Icons.chair_sharp, color: AppColors.secondary),
-      
+                      const SizedBox(width: 5,),
                       Text(
                         '$seats',
                         style: Theme.of(context).textTheme.titleMedium,
@@ -109,7 +110,7 @@ class DefaultCarCard extends StatelessWidget {
                       // ),
                       const SizedBox(width: 20,),
                       Icon(Icons.drive_eta_sharp, color: AppColors.secondary),
-      
+                      const SizedBox(width: 5,),
                       Text(
                         transmission,
                         style: Theme.of(context).textTheme.titleMedium,
