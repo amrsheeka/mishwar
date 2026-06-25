@@ -33,6 +33,7 @@ class MainLayout extends StatelessWidget {
           return Scaffold(
             backgroundColor: backgroundColor,
             appBar: AppBar(
+              centerTitle: false,
               backgroundColor: backgroundColor,
               actions: [
                 _AppBarAction(
