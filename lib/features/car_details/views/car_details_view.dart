@@ -9,6 +9,7 @@ import 'package:mishwar/features/car_details/data/models/car_details_model.dart'
 import 'package:mishwar/features/car_details/views/widgets/car_preview.dart';
 import 'package:mishwar/features/car_details/views/widgets/description_card.dart';
 import 'package:mishwar/features/car_details/views/widgets/quick_info_card.dart';
+import 'package:mishwar/features/car_details/views/widgets/reviews_section.dart';
 import 'package:mishwar/features/car_details/views/widgets/specification_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -24,24 +25,50 @@ class _CarDetailsViewState extends State<CarDetailsView> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.background;
+    final Color surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surface;
+    final Color textColor = isDark
+        ? AppColors.background
+        : AppColors.backgroundDark;
 
     return BlocProvider(
-      create: (context) => CarDetailsCubit()..getCarDetails(id: widget.id),
+      create: (context) => CarDetailsCubit()
+        ..getCarDetails(id: widget.id)
+        ..getReviews(id: widget.id),
       child: BlocBuilder<CarDetailsCubit, CarDetailsState>(
         builder: (context, state) {
           CarDetailsCubit cubit = context.read<CarDetailsCubit>();
           Car? car = cubit.carDetailsModel?.car;
-          bool isLoading = state is GetCarDetailsLoadingState;
+          bool isLoading = cubit.isCarLoading;
+          bool isReviewsLoading = cubit.isReviewsLoading;
           return Scaffold(
+            backgroundColor: backgroundColor,
             appBar: AppBar(
               centerTitle: true,
+              backgroundColor: backgroundColor,
+              elevation: 0,
               leading: Skeletonizer(
                 enabled: isLoading,
                 child: IconButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  icon: Center(child: Icon(IconBroken.Arrow___Left)),
+                  icon: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: surfaceColor,
+                    ),
+                    child: Icon(
+                      IconBroken.Arrow___Left,
+                      color: textColor,
+                    ),
+                  ),
                 ),
               ),
               actions: [
@@ -55,7 +82,7 @@ class _CarDetailsViewState extends State<CarDetailsView> {
                       height: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color:isDark? AppColors.surfaceDark:AppColors.surface,
+                        color: surfaceColor,
                       ),
                       child: IconButton(
                         padding: EdgeInsets.zero,
@@ -72,30 +99,50 @@ class _CarDetailsViewState extends State<CarDetailsView> {
               ],
               title: Skeletonizer(
                 enabled: isLoading,
-                child: Text('${car?.brand.name} ${car?.model} ${car?.year}'),
+                child: Text(
+                  '${car?.brand.name} ${car?.model} ${car?.year}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ),
             body: Skeletonizer(
               enabled: isLoading,
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CarPreview(car: car),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          quickInfoCard(car:car),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: Text(
-                              'Specification',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
+                          quickInfoCard(car: car),
+                          const SizedBox(height: 22),
+                          Row(
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                'Specification',
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
-
+                          const SizedBox(height: 12),
                           LayoutBuilder(
                             builder: (context, constraints) {
                               int crossAxisCount = constraints.maxWidth < 600
@@ -108,7 +155,7 @@ class _CarDetailsViewState extends State<CarDetailsView> {
                                 crossAxisCount: crossAxisCount,
                                 crossAxisSpacing: 12,
                                 mainAxisSpacing: 12,
-                                childAspectRatio: 2.3,
+                                childAspectRatio: 1.4,
                                 children: [
                                   SpecificationItem(
                                     title: 'Number of seats',
@@ -116,17 +163,17 @@ class _CarDetailsViewState extends State<CarDetailsView> {
                                     value: '${car?.seats}',
                                   ),
                                   SpecificationItem(
-                                    title: 'Common fuel inj.',
+                                    title: 'Fuel type',
                                     icon: Icons.propane_tank_sharp,
                                     value: '${car?.fuelType}',
                                   ),
                                   SpecificationItem(
-                                    title: 'Skin color',
+                                    title: 'Color',
                                     icon: Icons.color_lens_rounded,
                                     value: '${car?.color}',
                                   ),
                                   SpecificationItem(
-                                    title: 'Drive transmission',
+                                    title: 'Transmission',
                                     icon: Icons.drive_eta_sharp,
                                     value: '${car?.transmission}',
                                   ),
@@ -134,8 +181,15 @@ class _CarDetailsViewState extends State<CarDetailsView> {
                               );
                             },
                           ),
-                          SizedBox(height: 10),
-                          descriptionCard(context,car?.description ?? ''),
+                          const SizedBox(height: 22),
+                          descriptionCard(context, car?.description ?? ''),
+                          const SizedBox(height: 22),
+                          Skeletonizer(
+                            enabled: isReviewsLoading,
+                            child: ReviewsSection(
+                              reviews: cubit.reviewsResponseModel?.reviews,
+                            ),
+                          ),
                         ],
                       ),
                     ),
